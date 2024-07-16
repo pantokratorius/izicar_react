@@ -1,0 +1,21 @@
+.table tr:last-child td {
+    border-bottom: none !important;
+}
+
+.table {
+    width: 60%;
+    margin: 0 auto !important;
+}
+
+.table tr td:not(:first-child):not(:nth-child(2)) {
+    text-align: center;
+}
+
+.table tr td {
+    padding: 5px !important;
+}
+
+.table tr td:last-child {
+    white-space: nowrap;
+
+}
