@@ -1,38 +1,342 @@
-.App {
-  text-align: center;
+html,
+body {
+  padding: 0px;
+  margin: 0;
+  color: #282828;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    /* font-size: 13px; */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+* {
+  box-sizing: border-box;
+}
+
+table {
+  border-collapse: collapse;
+  background: rgb(255, 255, 255);
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 150px;
+}
+
+table caption {
+  font-size: 25px;
+  font-weight: bold;
+  text-align: left;
+  color: #ff6a00;
+  /* margin-left: 15px; */
+  padding: 15px;
+  margin-top: 20px;
+}
+
+
+
+/* table tr:nth-child(even) td {
+    background: #f3f3f3;
+} */
+
+ table th {
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  padding: 5px 10px; 
+}
+
+/* table th:first-child {
+  border-left: 1px solid;
+}
+
+table th:last-child {
+  border-right: 1px solid;
+} */
+
+table td{
+  padding: 7px 10px; 
+  border-radius: 5px;
+}
+
+
+table tbody tr:not(:first-child) {
+  border-top: 2px solid #fff;
+}
+
+/* table tr.articled + tr + tr ~ tr:not(tr.articled){
+  display: none;
+} */
+
+/* table tr:not(:first-child).articled {
+  border-top: 15px solid rgb(145, 145, 145) !important;
+} */
+
+table tr:not(:first-child).bordered {
+  border-top: 20px solid #fff;
+}
+
+
+table tr:last-child td {
+ border-bottom: 1px solid #000 !important;
+}
+
+table tr td:first-child {
+  width: 170px;
+}
+
+table tr td:nth-child(2) {
+  /* background: #f0f1ed;  */
+  width: 200px;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+button.top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding:  4px 15px 7px;
+  /* background-color: rgb(187, 187, 187); */
+  font-size: 35px;
+  cursor: pointer;
+  box-shadow: 3px 3px 6px rgb(145 145 145);
+  border-radius: 30px;
+  /* border: 1px solid #bebebe; */
+  background-color: #f0f0f0;
+  opacity: .5;
+}
+
+button:hover {
+  opacity: 1;
+}
+
+
+form {
+  margin: 10px 0 50px 5px;
+}
+
+form input[type="text"] {
+  width: 50%;
+  margin-right: 10px;
+}
+
+.suppliers {
+   display: flex;
+   align-items: center;
+   justify-content: flex-end;
+   padding-top: 10px;
+   padding-bottom: 20px;
+   flex-wrap: wrap;
   }
+
+  .suppliers > span {
+    padding: 2px 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 2px solid #686767;
+    box-shadow: 1px 1px 3px;
+  }
+  
+  .suppliers > span:not(:first-child):not(:nth-child(2)) {
+    
+    box-shadow: 1px 1px 3px 1px #ff7272;
+  }
+
+  @keyframes blink { 0%{ box-shadow: 1px 1px 0px 0px #ff7272; } 100%{ box-shadow: 1px 1px 3px 1px #ff0001; } }
+  
+  .suppliers > span {
+    margin-left: 10px;
+    user-select: none;
+  }
+
+  
+.brands {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 10px;
+  padding-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+
+.brands > span {
+  padding: 0 5px;
+  cursor: pointer;
+  margin: 2px 0;
+  text-transform: uppercase;
+  color: blue;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-decoration: underline;
+  user-select: none;
+ }  
+
+ .warehouse {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 10px;
+  padding-bottom: 20px;
+  flex-wrap: wrap;
+ }
+
+.warehouse > span {
+  border: 1px solid #0c9f6f;
+  border-radius: 3px;
+  margin: 2px;
+  color: #0c9f6f; 
+  padding: 0 2px;
+  cursor: pointer;
+  font-weight: bold;
+  user-select: none;
+}
+
+.names {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin-left: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+.names > span {
+  margin: 3px 0;
+  color: #a70000;
+  width: fit-content;
+  cursor: pointer;
+  font-weight: bold;
+  user-select: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.warehouse, .names { 
+  padding-top: 60px;
 }
+
+.closed{
+  height: 88px;
+  overflow: hidden;
+}
+ 
+
+  
+  .linethrough {
+    text-decoration: line-through;
+  }
+  
+  .suppliers > span.start {
+    background: #f3f3f3;
+  }
+
+  .suppliers > span.search {
+    animation: blink .5s infinite;
+  }
+  
+  .suppliers > span.found {
+    background: rgb(230, 230, 230);
+    box-shadow: none !important;
+  }
+  
+  .suppliers > span.notfound {
+    background: #fff;
+    text-decoration: line-through;
+    box-shadow: none !important;
+  }
+
+  .sort {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #4040ea;
+  }
+
+  .hidden {
+    display: none !important;  
+  }
+
+  .suppliers > span.noConnection {
+    background: #ff4d4d;
+    color: rgb(255, 255, 255);
+    box-shadow: none;
+  }
+
+
+  #show {
+    background: #f2ffc9;
+    margin-right: 100px;
+  }
+
+  img.google {
+    filter: gray; /* IE6-9 */
+    -webkit-filter: grayscale(1); /* Google Chrome, Safari 6+ & Opera 15+ */
+    filter: grayscale(1); /* Microsoft Edge and Firefox 35+ */
+  }
+
+
+  .popupWrap {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    z-index: 1;
+    top: 0;
+  }
+  
+  .popup {
+    border-radius: 10px;
+    padding: 20px 20px 40px;
+    background: #fff;
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .popup p input {
+    width: 40px;
+    margin-left: 10px;
+  }
+
+  .popup p {
+    width: 60%;
+    margin: 5px 0;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  #notification {
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 10;
+    padding: 10px;
+    color: #fff;
+    margin-top: 5px;
+    border-radius: 5px;
+  }
+  
+  #notification.success {
+    background: #2fac2f; 
+  }
+  
+  .failure {
+    background: #ac352f; 
+  }
+
+  #notfound {
+    color: red;
+    margin-left: 10px;
+    font-size: 13px;
+    margin-bottom: -20px;
+  }
+
+
+
