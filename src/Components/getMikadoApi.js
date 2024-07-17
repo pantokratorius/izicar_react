@@ -1,17 +1,22 @@
 // import sortdata from "../../../helpers/sort"
-import React from "react"
+import React, { useEffect } from "react"
 
 
-const getMikadoApi = async ({search}) => { 
+const getMikadoApi = (search) => { 
 
-    const supplier = 'Микадо'
 
-    const q = search
-    const data = await SearchGetParts(q, supplier)
-    if(data == 500) throwException(q,  supplier, 500)
-        else if(!data.length) throwException(q,  supplier)
-        else
-          return data.json()
+    useEffect(()=>{ 
+
+        const supplier = 'Микадо'
+    
+        const q = search
+        const data =  SearchGetParts(q, supplier)
+        if(data == 500) throwException(q,  supplier, 500)
+            else if(!data.length) throwException(q,  supplier)
+            else
+              return data.json()
+
+    },[])
 
 
 

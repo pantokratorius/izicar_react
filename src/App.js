@@ -10,7 +10,6 @@ import getFewDuplicates from "./helpers/getFewDuplicates";
 import sort from "./helpers/sort"
 import sortOpened from "./helpers/sortOpened"
 import sortByBrand from "./helpers/sortByName";
-import getMikadoApi from './Components/getMikadoApi.js';
 
 function App() {
   const [showZakupochnyje, setShowZakupochnyje] = useState (true);
@@ -321,28 +320,68 @@ const setNacenkiOpenedHandler = () => {
 // }
 
 
-  const getMikado = async search => {
-    const data = await getMikadoApi(search);
-    const dd = await data.json();
-    dd[0] && dd[0].notFound 
-    ? 
-    setSuppliers(suppliers => suppliers.map(item => (item.title == dd[0].supplier ? {...item, class: 'notfound'} : {...item} )) ) 
-    :
-    (
-      dd[0] && dd[0].noConnection 
-      ?
-      setSuppliers(suppliers => suppliers.map(item => (item.title == dd[0].supplier ? {...item, class: 'noConnection'} : {...item} )) ) 
-      :
-      (
-        setParts(prev => [...prev, ...dd]), 
-        setSuppliers(suppliers =>suppliers.map(item => (item.title == dd[0].supplier ? {...item, class: 'found'} : {...item} )) ),
-        setBrands(prev=>[...prev, ...[...new Map(dd.map(item => ( {brand: item.brand} )).map((item) => [item["brand"], item])).values()] ] ), 
-        setNames(prev=>[...prev, ...dd.map(item => (  {product_name: item.product_name}  )).filter((power, toThe, yellowVests) =>yellowVests.map( updateDemocracy => updateDemocracy['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1) ).indexOf(power['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1)) === toThe) ]  ),
-        setWarehouses(prev=>[...prev, ...[...new Map(dd.map(item => (  {warehouse_name: item.warehouse_name}  )).map((item) => [item["warehouse_name"], item])).values()] ] ),
-        setSearch(search)
-      )
-    )
+  const getMikado = async (q) => { 
+
+    const supplier = 'Микадо'
+
+    let dd
+    try{
+      const result = await fetch(
+            `http://izicar.grainpro.ru/?art=${q}`
+      );
+      const mass = await result.json(); 
+     
+      if (mass?.length) {  
+          const data = await mass
+              // .filter(p => p.num.match(/\d+/)[0] > 0)
+              .map(item => ({
+                  article: item.art,
+                  brand: item.brand,
+                  product_name: item.name,
+                  price: item.price,
+                  quantity: item.num,
+                  delivery_duration: item.d_deliv,
+                  supplier,
+                  color: '#ff00b8',
+                  warehouse_name: item.warehouse_name
+              })) 
+              
+          if (data?.length) {
+               dd =  [
+                  ...data
+              ]
+
+
+              dd[0] && dd[0].notFound 
+              ? 
+              setSuppliers(suppliers => suppliers.map(item => (item.title == dd[0].supplier ? {...item, class: 'notfound'} : {...item} )) ) 
+              :
+              (
+                dd[0] && dd[0].noConnection 
+                ?
+                setSuppliers(suppliers => suppliers.map(item => (item.title == dd[0].supplier ? {...item, class: 'noConnection'} : {...item} )) ) 
+                :
+                (
+                  setParts(prev => [...prev, ...dd]), 
+                  setSuppliers(suppliers =>suppliers.map(item => (item.title == dd[0].supplier ? {...item, class: 'found'} : {...item} )) ),
+                  setBrands(prev=>[...prev, ...[...new Map(dd.map(item => ( {brand: item.brand} )).map((item) => [item["brand"], item])).values()] ] ), 
+                  setNames(prev=>[...prev, ...dd.map(item => (  {product_name: item.product_name}  )).filter((power, toThe, yellowVests) =>yellowVests.map( updateDemocracy => updateDemocracy['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1) ).indexOf(power['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1)) === toThe) ]  ),
+                  setWarehouses(prev=>[...prev, ...[...new Map(dd.map(item => (  {warehouse_name: item.warehouse_name}  )).map((item) => [item["warehouse_name"], item])).values()] ] ),
+                  setSearch(search)
+                )
+              )
+
+
+          } else  dd = []
+      } else {
+        dd = []
+      }
+    }catch(e){
+      dd = [500]
+    }
+
   }
+  
   
   
 
@@ -526,8 +565,6 @@ const setNacenkiOpenedHandler = () => {
         <td style={{textAlign: 'center', width: '100px', background: '#eff1fb'}}>{item.quantity}</td>
         <td style={{textAlign: 'center', width: '150px', background: '#effbf6', maxWidth: '100px'}}>{item.delivery_duration} дн.</td>
         {showZakupochnyje ?  <td style={{textAlign: 'center', width: '150px', whiteSpace: 'nowrap', background: '#fbefef'}}>{ Number( item.price ) > 0 && `${ formatPrice(item.price) } р.` }</td> : null}
-        <td title={formatPrice(item.price)}  style={{textAlign: 'center', width: '150px', whiteSpace: 'nowrap', background: '#fbefef', fontWeight: 'bold'}}>{ Number( item.price ) > 0 && `${ formatPrice(item.price * (1 + nacenki.filter(it=>(it.name == item.supplier))[0].price / 100)) } р.` }</td>
-        <td onClick={selectOne} style={{textAlign: 'center', color: item.color || '#ff6a00', whiteSpace: 'nowrap', fontSize: '13px', cursor: 'pointer', width: '100px', maxWidth: '100px'}}><b>{item.supplier}</b></td>
         <td style={{textAlign: 'center', color: item.color || '#ff6a00', fontSize: '13px', maxWidth: '120px', width: '120px'}}>{item.warehouse_name}</td>
     </tr>  
 ))} 
