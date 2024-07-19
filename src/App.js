@@ -11,6 +11,10 @@ import sort from "./helpers/sort"
 import sortOpened from "./helpers/sortOpened"
 import sortByBrand from "./helpers/sortByName";
 
+import getMikadoApi from './Api/getMikadoApi';
+import getAvtotoApi from './Api/getAvtotoApi';
+import getForumAvtoApi from './Api/getForumAvtoApi';
+
 function App() {
   const [showZakupochnyje, setShowZakupochnyje] = useState (true);
   const [notification, setNotification] = useState ({on:false, text:'', status: 'success'});
@@ -33,47 +37,63 @@ function App() {
   const [suppliers, setSuppliers] = useState (
     [
       {
-        title: 'АБС',
-        class: 'start',
-        closed: true,
-        selected: false
-      },
-      {
-        title: 'Росско',
-        class: 'start',
-        closed: true,
-        selected: false
-      },{
         title: 'Микадо',
         class: 'start',
         closed: true,
-        selected: false
-      },{
+        selected: false,
+        getParts: (search,title) =>getMikado(search, title)
+      }
+      ,{
         title: 'Автото',
         class: 'start',
         closed: true,
-        selected: false
-      },{
+        selected: false,
+        getParts: (search,title)=>getAvtoto(search, title)
+      },
+      ,{
         title: 'Форум-Авто',
         class: 'start',
         closed: true,
-        selected: false
-      },{
-        title: 'Фаворит',
-        class: 'start',
-        closed: true,
-        selected: false
-      },{
-        title: 'Профит-лига',
-        class: 'start',
-        closed: true,
-        selected: false
+        selected: false,
+        getParts: (search,title)=>getForumAvto(search, title)
+        
       }
+      // {
+      //   title: 'Росско',
+      //   class: 'start',
+      //   closed: true,
+      //   selected: false,
+      //   getParts: () => getRossko()
+      // },
+      // {
+      //   title: 'АБС',
+      //   class: 'start',
+      //   closed: true,
+      //   selected: false,
+      //   getParts: 'getAbs'
+      // },
+      //   {
+      //   title: 'Микадо',
+      //   class: 'start',
+      //   closed: true,
+      //   selected: false
+      // }
+      // ,{
+      //   title: 'Фаворит',
+      //   class: 'start',
+      //   closed: true,
+      //   selected: false
+      // },{
+      //   title: 'Профит-лига',
+      //   class: 'start',
+      //   closed: true,
+      //   selected: false
+      // }
     ]);
 
 
     useEffect(()=>(
-      getNacenki()
+      () =>getNacenki()
     ),[])
 
   const  topFunction = () => {
@@ -105,15 +125,14 @@ function App() {
       return
     }
 
-
-  
-
-
      await Promise.all([
+
+      suppliers.forEach(item => item.getParts(search, item.title))
+      // getAvtoto(search),
+      // getMikado(search),
+
         // getForumAvto(search),
-        // getAvtoto(search),
         // getAbs(search),
-        getMikado(search),
         // getFavorit(search),
         // getRossko(search), // росско один склад без названия
         // getProfitLiga(search)
@@ -283,7 +302,9 @@ function App() {
     if( Object.values(e.target.classList).includes('popupWrap') )  setNacenkiOpened(false) 
   }
 
-  const getNacenki = () =>{
+  const getNacenki = async () =>{ 
+    const nacenki = await fetch('http://izicar.grainpro.ru/db.php?act=getAllNacenki/')
+    const nacenkiProps = await nacenki.json()
     setNacenki([...nacenkiProps])
     // setNacenki(suppliers.map(item=>({name: item.title, price: 10})))
   }
@@ -320,68 +341,65 @@ const setNacenkiOpenedHandler = () => {
 // }
 
 
-  const getMikado = async (q) => { 
 
-    const supplier = 'Микадо'
+const setPartsData = (dd, search, supplier) => {
+  dd == 'notFound'
+  ? 
+  setSuppliers(suppliers => suppliers.map(item => (item.title == supplier ? {...item, class: 'notfound'} : {...item} )) ) 
+  :
+  (
+    dd == 'noConnection'
+    ?
+    setSuppliers(suppliers => suppliers.map(item => (item.title == supplier ? {...item, class: 'noConnection'} : {...item} )) ) 
+    :
+    (
+      setParts(prev => [...prev, ...dd]), 
+      setSuppliers(suppliers =>suppliers.map(item => (item.title == supplier ? {...item, class: 'found'} : {...item} )) ),
+      setBrands(prev=>[...prev, ...[...new Map(dd.map(item => ( {brand: item.brand} )).map((item) => [item["brand"], item])).values()] ] ), 
+      setNames(prev=>[...prev, ...dd.map(item => (  {product_name: item.product_name}  )).filter((power, toThe, yellowVests) =>yellowVests.map( updateDemocracy => updateDemocracy['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1) ).indexOf(power['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1)) === toThe) ]  ),
+      setWarehouses(prev=>[...prev, ...[...new Map(dd.map(item => (  {warehouse_name: item.warehouse_name}  )).map((item) => [item["warehouse_name"], item])).values()] ] ),
+      setSearch(search)
+    )
+  )
+}
 
-    let dd
-    try{
-      const result = await fetch(
-            `http://izicar.grainpro.ru/?art=${q}`
-      );
-      const mass = await result.json(); 
-     
-      if (mass?.length) {  
-          const data = await mass
-              // .filter(p => p.num.match(/\d+/)[0] > 0)
-              .map(item => ({
-                  article: item.art,
-                  brand: item.brand,
-                  product_name: item.name,
-                  price: item.price,
-                  quantity: item.num,
-                  delivery_duration: item.d_deliv,
-                  supplier,
-                  color: '#ff00b8',
-                  warehouse_name: item.warehouse_name
-              })) 
+
+  const getMikado = async (q, supplier) => { 
+
+    const dd  = await getMikadoApi(q, supplier)
               
-          if (data?.length) {
-               dd =  [
-                  ...data
-              ]
+      if (dd?.length) {
 
+        setPartsData(dd, search, supplier)
 
-              dd[0] && dd[0].notFound 
-              ? 
-              setSuppliers(suppliers => suppliers.map(item => (item.title == dd[0].supplier ? {...item, class: 'notfound'} : {...item} )) ) 
-              :
-              (
-                dd[0] && dd[0].noConnection 
-                ?
-                setSuppliers(suppliers => suppliers.map(item => (item.title == dd[0].supplier ? {...item, class: 'noConnection'} : {...item} )) ) 
-                :
-                (
-                  setParts(prev => [...prev, ...dd]), 
-                  setSuppliers(suppliers =>suppliers.map(item => (item.title == dd[0].supplier ? {...item, class: 'found'} : {...item} )) ),
-                  setBrands(prev=>[...prev, ...[...new Map(dd.map(item => ( {brand: item.brand} )).map((item) => [item["brand"], item])).values()] ] ), 
-                  setNames(prev=>[...prev, ...dd.map(item => (  {product_name: item.product_name}  )).filter((power, toThe, yellowVests) =>yellowVests.map( updateDemocracy => updateDemocracy['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1) ).indexOf(power['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1)) === toThe) ]  ),
-                  setWarehouses(prev=>[...prev, ...[...new Map(dd.map(item => (  {warehouse_name: item.warehouse_name}  )).map((item) => [item["warehouse_name"], item])).values()] ] ),
-                  setSearch(search)
-                )
-              )
-
-
-          } else  dd = []
-      } else {
-        dd = []
-      }
-    }catch(e){
-      dd = [500]
-    }
-
+      } 
   }
+
+
+
+  const getAvtoto = async (q, supplier) => { 
+
+    const dd  = await getAvtotoApi(q, supplier)
+
+    if (dd?.length) {
+     
+      setPartsData(dd, search, supplier)
+   
+      } 
+  }
+
   
+
+  const getForumAvto = async (q, supplier) => { 
+
+    const dd  = await getForumAvtoApi(q, supplier)
+
+    if (dd?.length) {
+     
+      setPartsData(dd, search, supplier)
+   
+      } 
+  }
   
   
 
@@ -565,6 +583,8 @@ const setNacenkiOpenedHandler = () => {
         <td style={{textAlign: 'center', width: '100px', background: '#eff1fb'}}>{item.quantity}</td>
         <td style={{textAlign: 'center', width: '150px', background: '#effbf6', maxWidth: '100px'}}>{item.delivery_duration} дн.</td>
         {showZakupochnyje ?  <td style={{textAlign: 'center', width: '150px', whiteSpace: 'nowrap', background: '#fbefef'}}>{ Number( item.price ) > 0 && `${ formatPrice(item.price) } р.` }</td> : null}
+        <td title={formatPrice(item.price)}  style={{textAlign: 'center', width: '150px', whiteSpace: 'nowrap', background: '#fbefef', fontWeight: 'bold'}}>{ Number( item.price ) > 0 && `${ formatPrice(item.price * (1 + nacenki.filter(it=>(it.name == item.supplier))[0].price / 100)) } р.` }</td>
+        <td onClick={selectOne} style={{textAlign: 'center', color: item.color || '#ff6a00', whiteSpace: 'nowrap', fontSize: '13px', cursor: 'pointer', width: '100px', maxWidth: '100px'}}><b>{item.supplier}</b></td>
         <td style={{textAlign: 'center', color: item.color || '#ff6a00', fontSize: '13px', maxWidth: '120px', width: '120px'}}>{item.warehouse_name}</td>
     </tr>  
 ))} 

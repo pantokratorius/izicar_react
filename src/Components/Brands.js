@@ -6,7 +6,12 @@ export const Brands = ({change, divClass, type, items,   selectAllBrands, sortBy
   const [brandsOpened, setBrandsOpened] =  useState ({brand: false, warehouse_name: false, product_name: false});
     
   useEffect(()=>{ 
-    console.log('aa');
+      // setBrandsOpened({brand: false, warehouse_name: false, product_name: false});
+        document.querySelector('.more'+type) ?
+        ifNExtLine() ? 
+        document.querySelector('.more'+type).classList.remove('hidden') :
+        document.querySelector('.more'+type).classList.add('hidden')
+        : null
     },[items])
 
     useEffect(()=>{ 
