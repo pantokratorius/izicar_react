@@ -23,10 +23,7 @@ const getMikadoApi = async (q, supplier) => {
                         warehouse_name: item.warehouse_name
                     }))
                 if (data?.length) {
-                    const newData = [
-                        ...data
-                    ]
-                    return newData
+                    return [...data]
                 } else  return 'notFound'
             } else {
                 return 'notFound'

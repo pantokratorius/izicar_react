@@ -43,21 +43,21 @@ function App() {
         selected: false,
         getParts: (search,title) =>getMikado(search, title)
       }
-      ,{
-        title: 'Автото',
-        class: 'start',
-        closed: true,
-        selected: false,
-        getParts: (search,title)=>getAvtoto(search, title)
-      },
-      ,{
-        title: 'Форум-Авто',
-        class: 'start',
-        closed: true,
-        selected: false,
-        getParts: (search,title)=>getForumAvto(search, title)
+      // ,{
+      //   title: 'Автото',
+      //   class: 'start',
+      //   closed: true,
+      //   selected: false,
+      //   getParts: (search,title)=>getAvtoto(search, title)
+      // },
+      // ,{
+      //   title: 'Форум-Авто',
+      //   class: 'start',
+      //   closed: true,
+      //   selected: false,
+      //   getParts: (search,title)=>getForumAvto(search, title)
         
-      }
+      // }
       // {
       //   title: 'Росско',
       //   class: 'start',
@@ -93,7 +93,7 @@ function App() {
 
 
     useEffect(()=>(
-      () =>getNacenki()
+        getNacenki()
     ),[])
 
   const  topFunction = () => {
@@ -342,25 +342,21 @@ const setNacenkiOpenedHandler = () => {
 
 
 
-const setPartsData = (dd, search, supplier) => {
-  dd == 'notFound'
-  ? 
-  setSuppliers(suppliers => suppliers.map(item => (item.title == supplier ? {...item, class: 'notfound'} : {...item} )) ) 
-  :
-  (
-    dd == 'noConnection'
-    ?
+const setPartsData = (dd, search, supplier) => { 
+  if(dd.result && dd.result == 'notFound'){
+    setSuppliers(suppliers => suppliers.map(item => (item.title == supplier ? {...item, class: 'notfound'} : {...item} )) ) 
+  }
+  else if (dd.result && dd.result == 'noConnection')
     setSuppliers(suppliers => suppliers.map(item => (item.title == supplier ? {...item, class: 'noConnection'} : {...item} )) ) 
-    :
-    (
+else    
+    {
       setParts(prev => [...prev, ...dd]), 
       setSuppliers(suppliers =>suppliers.map(item => (item.title == supplier ? {...item, class: 'found'} : {...item} )) ),
       setBrands(prev=>[...prev, ...[...new Map(dd.map(item => ( {brand: item.brand} )).map((item) => [item["brand"], item])).values()] ] ), 
       setNames(prev=>[...prev, ...dd.map(item => (  {product_name: item.product_name}  )).filter((power, toThe, yellowVests) =>yellowVests.map( updateDemocracy => updateDemocracy['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1) ).indexOf(power['product_name']?.toLowerCase().replace(/-/g,'').substring(0,1)) === toThe) ]  ),
       setWarehouses(prev=>[...prev, ...[...new Map(dd.map(item => (  {warehouse_name: item.warehouse_name}  )).map((item) => [item["warehouse_name"], item])).values()] ] ),
       setSearch(search)
-    )
-  )
+    }
 }
 
 
